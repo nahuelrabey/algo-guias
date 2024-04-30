@@ -1,0 +1,198 @@
+\documentclass[6pt]{article}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage[a4paper, margin=0.5in]{geometry}
+\lstset{mathescape=true}
+
+\title{Practica 4}
+\author{Nahuel Rabey}
+
+\begin{document}
+\maketitle
+
+\subsection*{Ejercicio 1}
+\begin{lstlisting}
+TAD Racional {
+	obs num: $\mathbb{Z}$
+	obs den: $\mathbb{N}$
+	proc nuevo(in n: $\mathbb{Z}$, in d: $\mathbb{N}$){
+		asegura{res.num = n}
+		asegura{res.den = d}
+	}
+	proc sumar(in x: Racional, in y: Racional): Racional {
+		asegura{res.num = x.num * y.den + y.num * x.den }
+		asegura{res.den = x.den * y.den}
+	}
+	proc restar(in x: Racional, in y: Racional): Racional {
+		asegura{res.num = x.num * y.den - y.num * x.den }
+		asegura{res.den = x.den * y.den}
+	}
+	proc multiplicar(in x: Racional, in y: Racional): Racional {
+		asegura{res.num = x.num * y.num }
+		asegura{res.den = x.den * y.den}
+	}
+	proc dividir(in x: Racional, in y: Racional): Racional {
+		asegura{res.num = x.num * y.den }
+		asegura{res.den = x.den * y.num}
+	}
+}
+\end{lstlisting}
+
+\subsection*{Ejercicio 3}
+\begin{lstlisting}
+TAD DobleCola< T >{
+	obs data: seq< T >
+	proc nueva(){
+		asegura{$res.data = <>$}
+	}
+	proc encolarAdelante(inout c: DC< T >, in elem: T){
+		requiere {$c = C_{0}$}
+		asegura {$c.data = <elem> \iff |c.data| = 0$}
+		asegura {$c.data = <elem>++C_{0}.data \iff |c.data| > 0$}
+	}
+	proc encolarDetras(inout c: DC < T >, in elem: T){
+		requiere {$c = C_{0}$}
+		asegura { $c.data = <elem> \iff |c.data| = 0$}
+		asegura {$c.data = C_{0}.data ++ <elem> \iff |c.data| > 0$}
+	}
+	proc desencolar(inout c: DC < T >, in elem: T){
+		requiere {$c = C_{0}$}
+		asegura {$c.data = <> \iff |c.data| = 0$}
+		asegura {$c.data = <C_{0}.data[0]> \iff |c.data| \in \{ 1,2 \}$}
+		asegura{$c.data = <C_{0}.data[0]> ++ subseq(C_{0}.data,2,|C_{0}.data|-1)$}
+		
+	}
+}
+\end{lstlisting}
+
+\subsection*{Ejercicio 4}
+
+\begin{lstlisting}
+TAD DobleCola< T >{
+    obs data: seq< T >
+    proc nueva(){
+        asegura{$res.data = <>$}
+    }
+    proc encolarAdelante(inout c: DC< T >, in elem: T){
+        requiere {$c = C_{0}$}
+        asegura {$c.data = <elem> \iff |c.data| = 0$}
+        asegura {$c.data = <elem>++C_{0}.data \iff |c.data| > 0$}
+    }
+    proc encolarDetras(inout c: DC < T >, in elem: T){
+        requiere {$c = C_{0}$}
+        asegura { $c.data = <elem> \iff |c.data| = 0$}
+        asegura {$c.data = C_{0}.data ++ <elem> \iff |c.data| > 0$}
+    }
+    proc desencolar(inout c: DC < T >, in elem: T){
+        requiere {$c = C_{0}$}
+        asegura {$c.data = <> \iff |c.data| = 0$}
+        asegura {$c.data = <C_{0}.data[0]> \iff |c.data| \in \{ 1,2 \}$}
+        asegura{$c.data = <C_{0}.data[0]> ++ subseq(C_{0}.data,2,|C_{0}.data|-1)$}
+        
+    }
+}
+\end{lstlisting}
+
+\subsection*{Ejercicio 5}
+
+\begin{lstlisting}
+TAD ColaPrioridad < T >{
+    //Asumamos que el resto de la implementacion esta aca
+	proc desapilarMax(inout c: CP< T >){
+		requiere{$c = C_{0},tmp$}
+		requiere{$c.d \neq \{  \}$}
+		asegura{tienePriMax($C_{0}.d$, res)}
+		asegura{$(\forall e'\in d)(res == e' \land_{L} delKey(C_{0}.d,res))$}
+		asegura{$c.d = C_{0}.d$}
+	}
+	pred tienePriMax(d: dict< T >,  e: T){
+		{$e \in d \land_{L} (\forall e':T)(e'\in D \to d[e]\geq d[e'])$}
+	}
+}
+\end{lstlisting}
+
+\newpage
+\subsection*{Ejercicio 6}
+
+\begin{lstlisting}
+TAD Conjunto< T >{
+	obs length(): $\mathbb{Z}_{\geq 0}$
+	obs pertenece(elem: T): Bool
+	proc conjuntoVacio(): Conjunto< T>{
+		asegura{res.length = 0}
+	}
+	proc pertenece(in c: Conjunto < T >, in elem: T): Bool{
+		asegura(res = c.pertenece(elem))
+	}
+	proc agregar(inout c: Conjunto< T>, in elem: T){
+		asegura(c.pertenece(elem) = True)
+	}
+	proc sacar(inout c: Conjunto< T>, in elem: T){
+		asegura(c.pertenece(elem) = False)
+	}
+	proc unir(inout A: Conjunto< T>, in B: Conjunto < T>){
+		asegura {$(\forall x \in T)(B.pertenece(x) = True\to_{L} A.pertenece(x)=True)$}
+	}
+	proc restar(inout A: Conjunto< T>, in B: Conjunto < T>){
+		asegura {$(\forall x \in T)(B.pertenece(x) = True\to_{L} A.pertenece(x)=False)$}
+	}
+	proc intersecar(inout A: Conjunto< T>, in B: Conjunto < T>){
+		requiere{$A_{0}=A$}
+		asegura {
+                    $(\forall x \in T)$
+                    $(B.pertenece(x) = True \land A_{0}.pertenece(x)=True\to_{L} A.pertenece(x)=True)$
+                }
+	}
+	proc agregarRapido(inout A: Conjunto< T>, in elem:  T){
+		requiere{$A.pertenece(elem)=False$}
+		asegura{$A.pertenece(elem)=True$} 
+	}
+	proc tamano(in c: Conjunto< T>): $\mathbb{Z}${
+		asegura{$res = c.length()$}
+	}
+}
+\end{lstlisting}
+
+\subsection*{Ejercicio 7}
+\subsubsection*{a}
+
+\begin{lstlisting}
+TAD Conjunto< T >{
+	obs length(): $\mathbb{Z}_{\geq 0}$
+	obs pertenece(elem: T): Bool
+	proc conjuntoVacio(): Conjunto< T>{
+		asegura{res.length = 0}
+	}
+	proc pertenece(in c: Conjunto < T >, in elem: T): Bool{
+		asegura(res = c.pertenece(elem))
+	}
+	proc agregar(inout c: Conjunto< T>, in elem: T){
+		asegura(c.pertenece(elem) = True)
+	}
+	proc sacar(inout c: Conjunto< T>, in elem: T){
+		asegura(c.pertenece(elem) = False)
+	}
+	proc unir(inout A: Conjunto< T>, in B: Conjunto < T>){
+		asegura {$(\forall x \in T)(B.pertenece(x) = True\to_{L} A.pertenece(x)=True)$}
+	}
+	proc restar(inout A: Conjunto< T>, in B: Conjunto < T>){
+		asegura {$(\forall x \in T)(B.pertenece(x) = True\to_{L} A.pertenece(x)=False)$}
+	}
+	proc intersecar(inout A: Conjunto< T>, in B: Conjunto < T>){
+		requiere{$A_{0}=A$}
+		asegura {
+			($\forall x \in T$)
+			($B.pertenece(x) = True \land A_{0}.pertenece(x)=True\to_{L} A.pertenece(x)=True$)
+		}
+	}
+	proc agregarRapido(inout A: Conjunto< T>, in elem:  T){
+		requiere{$A.pertenece(elem)=False$}
+		asegura{$A.pertenece(elem)=True$} 
+	}
+	proc tamano(in c: Conjunto< T>): $\mathbb{Z}${
+		asegura{$res = c.length()$}
+	}
+}
+\end{lstlisting}
+
+\end{document}
